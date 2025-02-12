@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>短信测试工具</title>
+    <script>
+        async function sendSMS() {
+            const phone = document.getElementById("phone").value;
+            const message = document.getElementById("message").value;
+            const apiProvider = document.getElementById("apiProvider").value;
+            let apiUrl = "";
+            
+            if (apiProvider === "textbelt") {
+                apiUrl = "https://textbelt.com/text";
+            } else if (apiProvider === "freebulksms") {
+                apiUrl = "https://www.freebulksms.com/send";
+            } else if (apiProvider === "messagebird") {
+                alert("MessageBird 需要 API Key，你需要自行申请。");
+                return;
+            }
+            
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    phone: phone,
+                    message: message,
+                    key: "textbelt" // 如果是 textbelt 免费版，key 可设为 "textbelt"
+                })
+            });
+            
+            const result = await response.json();
+            document.getElementById("result").innerText = result.success ? "短信发送成功" : "发送失败: " + (result.error || "未知错误");
+        }
+    </script>
+</head>
+<body>
+    <h2>短信测试工具</h2>
+    <label>手机号码：</label>
+    <input type="text" id="phone" placeholder="输入手机号码"><br><br>
+    <label>测试内容：</label>
+    <input type="text" id="message" placeholder="输入短信内容"><br><br>
+    <label>选择短信API：</label>
+    <select id="apiProvider">
+        <option value="textbelt">Textbelt</option>
+        <option value="freebulksms">FreeBulkSMS</option>
+        <option value="messagebird">MessageBird</option>
+    </select><br><br>
+    <button onclick="sendSMS()">发送测试短信</button>
+    <p id="result"></p>
+</body>
+</html>
